@@ -1,20 +1,59 @@
+
 const express = require('express')
 const app = express()
 const port = 8765
 
 app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:date/', (req, res) => {
-	if(req.params.d == 'year') res.send('query gia 1c')
-	else if(req.params.d == 'month') res.send('query gia 1b')
-	else if(req.params.d == 'date') res.send('query gia 1a')
-	else res.status(404).send('ERROR 404')
+	if (req.query.format == 'csv'){ //csv format
+		if(req.params.d == 'year') res.send('query bgia 1c')
+		else if(req.params.d == 'month') res.send('query gia 1b')
+		else if(req.params.d == 'date') res.send('query gia 1a')
+		else res.status(404).send('ERROR 404')}
+	else {  //JSON format
+		if(req.params.d == 'year') res.send('query agia 1c')
+		else if(req.params.d == 'month') res.send('query gia 1b')
+		else if(req.params.d == 'date') res.send('query gia 1a')
+		else res.status(404).send('ERROR 404')
+	}
 });
 
-app.get('/energy/api/DayAheadTotalLoadForecast', (req, res) => {
-	res.send('DayAheadTotalLoadForecast')
+app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolution/:d/:date/', (req, res) => {
+	if (req.query.format == 'csv'){ //csv format
+		if(req.params.d == 'year') res.send('query gia 2c')
+		else if(req.params.d == 'month') res.send('query gia 2b')
+		else if(req.params.d == 'date') res.send('query gia 2a')
+		else res.status(404).send('ERROR 404')}
+	else {  //JSON format
+		if(req.params.d == 'year') res.send('query gia 2c')
+		else if(req.params.d == 'month') res.send('query gia 2b')
+		else if(req.params.d == 'date') res.send('query gia 2a')
+		else res.status(404).send('ERROR 404')}
 });
 
-app.get('/energy/api/AggregatedGenerationPerType', (req, res) => {
-	res.send('AggregatedGenerationPerType')
+app.get('/energy/api/AggregatedGenerationPerType/:areaname/:resolution/:d/:date/', (req, res) => {
+	if (req.query.format == 'csv'){ //csv format
+		if(req.params.d == 'year') res.send('query gia 3c')
+		else if(req.params.d == 'month') res.send('query gia 3b')
+		else if(req.params.d == 'date') res.send('query gia 3a')
+		else res.status(404).send('ERROR 404')}
+	else {  //JSON format
+		if(req.params.d == 'year') res.send('query gia 3c')
+		else if(req.params.d == 'month') res.send('query gia 3b')
+		else if(req.params.d == 'date') res.send('query gia 3a')
+		else res.status(404).send('ERROR 404')}
+});
+
+app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, res) => {
+	if (req.query.format == 'csv'){ //csv format
+		if(req.params.d == 'year') res.send('query gia 4c')
+		else if(req.params.d == 'month') res.send('query gia 4b')
+		else if(req.params.d == 'date') res.send('query gia 4a')
+		else res.status(404).send('ERROR 404')}
+	else {  //JSON format
+		if(req.params.d == 'year') res.send('query gia 4c')
+		else if(req.params.d == 'month') res.send('query gia 4b')
+		else if(req.params.d == 'date') res.send('query gia 4a')
+		else res.status(404).send('ERROR 404')}
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
