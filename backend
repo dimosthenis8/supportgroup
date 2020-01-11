@@ -2,8 +2,11 @@ const express = require('express')
 const app = express()
 const port = 8765
 
-app.get('/energy/api/ActualTotalLoad', (req, res) => {
-	res.send('ActualTotalLoad')
+app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:date/', (req, res) => {
+	if(req.params.d == 'year') res.send('query gia 1c')
+	else if(req.params.d == 'month') res.send('query gia 1b')
+	else if(req.params.d == 'date') res.send('query gia 1a')
+	else res.status(404).send('ERROR 404')
 });
 
 app.get('/energy/api/DayAheadTotalLoadForecast', (req, res) => {
