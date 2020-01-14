@@ -169,9 +169,9 @@ CREATE UNIQUE INDEX IX_ResolutionCode_ResolutionCodeText
   ON ResolutionCode (ResolutionCodeText);
 
 
-#ALTER TABLE `ActualTotalLoad` ADD CONSTRAINT FKActualTota167504 FOREIGN KEY (AreaCodeId) REFERENCES AllocatedEICDetail (Id);
+ALTER TABLE `ActualTotalLoad` ADD CONSTRAINT FKActualTota167504 FOREIGN KEY (AreaCodeId) REFERENCES AllocatedEICDetail (Id);
 ALTER TABLE `ActualTotalLoad` ADD CONSTRAINT `FK_ActualTotalLoad _AreaTypeCode_AreaTypeCodeId` FOREIGN KEY (AreaTypeCodeId) REFERENCES AreaTypeCode (Id) ON UPDATE No action ON DELETE No action;
-#ALTER TABLE `ActualTotalLoad` ADD CONSTRAINT `FK_ActualTotalLoad _MapCode_MapCodeId` FOREIGN KEY (MapCodeId) REFERENCES MapCode (Id) ON UPDATE No action ON DELETE No action;
+ALTER TABLE `ActualTotalLoad` ADD CONSTRAINT `FK_ActualTotalLoad _MapCode_MapCodeId` FOREIGN KEY (MapCodeId) REFERENCES MapCode (Id) ON UPDATE No action ON DELETE No action;
 ALTER TABLE `ActualTotalLoad` ADD CONSTRAINT `FK_ActualTotalLoad _ResolutionCode_ResolutionCodeId` FOREIGN KEY (ResolutionCodeId) REFERENCES ResolutionCode (Id) ON UPDATE No action ON DELETE No action;
 
 
