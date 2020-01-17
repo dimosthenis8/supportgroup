@@ -1,58 +1,248 @@
 
 const express = require('express')
 const app = express()
+
 const port = 8765
+
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: ""
+});
+
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
+function convertToCSV(arr) {
+  const array = [Object.keys(arr[0])].concat(arr)
+
+  return array.map(it => {
+    return Object.values(it).toString()
+  }).join('<br/>')
+}
 
 app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
-		if(req.params.d == 'year') res.send('query bgia 1c')
-		else if(req.params.d == 'month') res.send('query gia 1b')
-		else if(req.params.d == 'date') res.send('query gia 1a')
+		if(req.params.d == 'year') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'month') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'date')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
-		if(req.params.d == 'year') res.send('query agia 1c')
-		else if(req.params.d == 'month') res.send('query gia 1b')
-		else if(req.params.d == 'date') res.send('query gia 1a')
+		if(req.params.d == 'year') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'month') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'date') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
 		else res.status(404).send('ERROR 404')
 	}
 });
 
 app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
-		if(req.params.d == 'year') res.send('query gia 2c')
-		else if(req.params.d == 'month') res.send('query gia 2b')
-		else if(req.params.d == 'date') res.send('query gia 2a')
+		if(req.params.d == 'year') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'month') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'date') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
-		if(req.params.d == 'year') res.send('query gia 2c')
-		else if(req.params.d == 'month') res.send('query gia 2b')
-		else if(req.params.d == 'date') res.send('query gia 2a')
+		if(req.params.d == 'year')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'month')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'date')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
 		else res.status(404).send('ERROR 404')}
 });
 
 app.get('/energy/api/AggregatedGenerationPerType/:areaname/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
-		if(req.params.d == 'year') res.send('query gia 3c')
-		else if(req.params.d == 'month') res.send('query gia 3b')
-		else if(req.params.d == 'date') res.send('query gia 3a')
+		if(req.params.d == 'year') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'month') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'date') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
-		if(req.params.d == 'year') res.send('query gia 3c')
-		else if(req.params.d == 'month') res.send('query gia 3b')
-		else if(req.params.d == 'date') res.send('query gia 3a')
+		if(req.params.d == 'year')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'month')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'date') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
 		else res.status(404).send('ERROR 404')}
 });
 
 app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
-		if(req.params.d == 'year') res.send('query gia 4c')
-		else if(req.params.d == 'month') res.send('query gia 4b')
-		else if(req.params.d == 'date') res.send('query gia 4a')
+		if(req.params.d == 'year')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'month') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'date')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+        		if(err) throw err;
+        		var csv=convertToCSV(result);
+        		res.send(csv);
+        		console.log('Results returned');
+			});
+		}
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
-		if(req.params.d == 'year') res.send('query gia 4c')
-		else if(req.params.d == 'month') res.send('query gia 4b')
-		else if(req.params.d == 'date') res.send('query gia 4a')
+		if(req.params.d == 'year') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'month')  {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
+		else if(req.params.d == 'date') {
+			let sql='SELECT * FROM data.AreaTypeCode';
+			con.query(sql, (err, result) => {
+				res.send(result);
+        		console.log('Results returned');
+			});
+		}
 		else res.status(404).send('ERROR 404')}
 });
 
