@@ -9,7 +9,8 @@ var mysql = require('mysql');
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: ""
+  password: "",
+  database: "data"
 });
 
 con.connect(function(err) {
@@ -21,60 +22,75 @@ function convertToCSV(arr) {
   const array = [Object.keys(arr[0])].concat(arr)
 
   return array.map(it => {
-    return Object.values(it).toString()
+    return Object.values(it).toString() 
   }).join('<br/>')
 }
 
-app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:date/', (req, res) => {
+app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:year-:mon-:day/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
 		if(req.params.d == 'year') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='1c';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
-        		console.log('Results returned');
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
+        		console.log('Results returned,1c,csv'); 
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='1b';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
-        		console.log('Results returned');
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
+        		console.log('Results returned,1b,csv'); 
 			});
 		}
 		else if(req.params.d == 'date')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT "entso-e" AS Source, "ActualTotalLoad" AS Datasate, AreaName, AreaTypeCodeText, MapCodeText, ResolutionCodeText, Year, Month, Day, DateTime, TotalLoadValue, UpdateTime FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCode.Id = ResolutionCodeId AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Year=' + req.params.year + ' AND Month=' + req.params.mon + ' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
-        		console.log('Results returned');
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
+        		console.log('Results returned,1a,csv'); 
 			});
 		}
-		else res.status(404).send('ERROR 404')}
+		else res.status(404).send('ERROR 404')} 
 	else {  //JSON format
 		if(req.params.d == 'year') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT "entso-e" AS Source, "ActualTotalLoad" AS Datasate, AreaName, AreaTypeCodeText, MapCodeText, ResolutionCodeText, Year, Month, Day, DateTime, TotalLoadValue, UpdateTime FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCode.Id = ResolutionCodeId AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Year=' + req.params.year + ' AND Month=' + req.params.mon + ' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
 			con.query(sql, (err, result) => {
 				res.send(result);
-        		console.log('Results returned');
+        		console.log('Results returned,1a,json');
 			});
 		}
 		else res.status(404).send('ERROR 404')
@@ -84,7 +100,7 @@ app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:date/', (req, res
 app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
 		if(req.params.d == 'year') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -93,7 +109,7 @@ app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolu
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -102,7 +118,7 @@ app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolu
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -113,21 +129,21 @@ app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolu
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
 		if(req.params.d == 'year')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
@@ -139,7 +155,7 @@ app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolu
 app.get('/energy/api/AggregatedGenerationPerType/:areaname/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
 		if(req.params.d == 'year') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -148,7 +164,7 @@ app.get('/energy/api/AggregatedGenerationPerType/:areaname/:resolution/:d/:date/
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -157,7 +173,7 @@ app.get('/energy/api/AggregatedGenerationPerType/:areaname/:resolution/:d/:date/
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -168,21 +184,21 @@ app.get('/energy/api/AggregatedGenerationPerType/:areaname/:resolution/:d/:date/
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
 		if(req.params.d == 'year')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
@@ -194,7 +210,7 @@ app.get('/energy/api/AggregatedGenerationPerType/:areaname/:resolution/:d/:date/
 app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
 		if(req.params.d == 'year')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -203,7 +219,7 @@ app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, re
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -212,7 +228,7 @@ app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, re
 			});
 		}
 		else if(req.params.d == 'date')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		var csv=convertToCSV(result);
@@ -223,21 +239,21 @@ app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, re
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
 		if(req.params.d == 'year') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month')  {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT * FROM data.AreaTypeCode';
+			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
 				res.send(result);
         		console.log('Results returned');
