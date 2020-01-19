@@ -29,7 +29,7 @@ function convertToCSV(arr) {
 app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:year-:mon-:day/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
 		if(req.params.d == 'year') {
-			let sql='1c';
+			let sql='SELECT "entso-e" AS Source, "ActualTotalLoad" AS Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, sum(TotalLoadValue) as ActualTotalLoadValue FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND ResolutionCode.Id = ResolutionCodeId AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Year =' + req.params.year + ' GROUP BY ActualTotalLoad.Month';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		if (result==''){
@@ -43,7 +43,7 @@ app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:year-:mon-:day/',
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='1b';
+			let sql='SELECT "entso-e" AS Source, "0ActualTotalLoad" AS Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, sum(TotalLoadValue) as ActualTotalLoadValue FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND ResolutionCode.Id = ResolutionCodeId AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Month =' + req.params.mon + ' AND Year =' + req.params.year + ' GROUP BY ActualTotalLoad.Day';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		if (result==''){
@@ -57,7 +57,7 @@ app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:year-:mon-:day/',
 			});
 		}
 		else if(req.params.d == 'date')  {
-			let sql='SELECT "entso-e" AS Source, "ActualTotalLoad" AS Datasate, AreaName, AreaTypeCodeText, MapCodeText, ResolutionCodeText, Year, Month, Day, DateTime, TotalLoadValue, UpdateTime FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCode.Id = ResolutionCodeId AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Year=' + req.params.year + ' AND Month=' + req.params.mon + ' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
+			let sql='SELECT "entso-e" AS Source, "ActualTotalLoad" AS Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, DateTime as DateTimeUTC, TotalLoadValue as ActualTotalLoadValue, UpdateTime as UpdateTimeUTC FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCode.Id = ResolutionCodeId AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Year=' + req.params.year + ' AND Month=' + req.params.mon + ' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
         		if (result==''){
@@ -73,23 +73,38 @@ app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:year-:mon-:day/',
 		else res.status(404).send('ERROR 404')} 
 	else {  //JSON format
 		if(req.params.d == 'year') {
-			let sql='SELECT * FROM AreaTypeCode';
+			let sql='SELECT "entso-e" AS Source, "ActualTotalLoad" AS Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, sum(TotalLoadValue) as ActualTotalLoadValue FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND ResolutionCode.Id = ResolutionCodeId AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Year =' + req.params.year + ' GROUP BY ActualTotalLoad.Month';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='SELECT * FROM AreaTypeCode';
+			let sql='SELECT "entso-e" AS Source, "0ActualTotalLoad" AS Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, sum(TotalLoadValue) as ActualTotalLoadValue FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND ResolutionCode.Id = ResolutionCodeId AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Month =' + req.params.mon + ' AND Year =' + req.params.year + ' GROUP BY ActualTotalLoad.Day';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT "entso-e" AS Source, "ActualTotalLoad" AS Datasate, AreaName, AreaTypeCodeText, MapCodeText, ResolutionCodeText, Year, Month, Day, DateTime, TotalLoadValue, UpdateTime FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCode.Id = ResolutionCodeId AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Year=' + req.params.year + ' AND Month=' + req.params.mon + ' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
+			let sql='SELECT "entso-e" AS Source, "ActualTotalLoad" AS Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, DateTime as DateTimeUTC, TotalLoadValue as ActualTotalLoadValue, UpdateTime as UpdateTimeUTC FROM ActualTotalLoad, ResolutionCode, AreaTypeCode, MapCode WHERE AreaName=' +"'"+req.params.areaname+"'"+ ' AND ResolutionCode.Id = ResolutionCodeId AND ResolutionCodeText=' + "'" +req.params.resolution+"'" + ' AND MapCode.Id=MapCodeId AND AreaTypeCode.Id=AreaTypeCodeId AND Year=' + req.params.year + ' AND Month=' + req.params.mon + ' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned,1a,json');
 			});
 		}
@@ -100,52 +115,100 @@ app.get('/energy/api/ActualTotalLoad/:areaname/:resolution/:d/:year-:mon-:day/',
 app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
 		if(req.params.d == 'year') {
-			let sql='SELECT * FROM AreaTypeCode';
+			if (req.params.productiontype != "AllTypes")
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, ProductionTypeText as ProductionType, sum(ActualGenerationOutput) as ActualGenerationOutputByMonthValue FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND ProductionTypeText= '+ "'" +req.params.productiontype+"'" +' AND Year ='+ req.params.year + ' GROUP BY AggregatedGenerationPerType.Month';
+			else 
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, ProductionTypeText as ProductionType, sum(ActualGenerationOutput) as ActualGenerationOutputByMonthValue FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND Year ='+ req.params.year + ' GROUP BY AggregatedGenerationPerType.Month, ProductionType.Id';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
-        		console.log('Results returned');
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
+        		console.log('Results returned,2c,csv');
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='SELECT * FROM AreaTypeCode';
+			if (req.params.productiontype != "AllTypes")
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, ProductionTypeText as ProductionType, sum(ActualGenerationOutput) as ActualGenerationOutputByDayValue FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND ProductionTypeText='+ "'" +req.params.productiontype+"'" +' AND Year ='+ req.params.year + ' AND Month=' + req.params.day+ ' GROUP BY AggregatedGenerationPerType.Day';
+			else 
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, ProductionTypeText as ProductionType, sum(ActualGenerationOutput) as ActualGenerationOutputByDayValue FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND Year ='+ req.params.year + ' AND Month=' + req.params.day+ ' GROUP BY AggregatedGenerationPerType.Day, ProductionType.Id';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
-        		console.log('Results returned');
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
+        		console.log('Results returned,2b,csv');
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT * FROM AreaTypeCode';
+			if (req.params.productiontype != "AllTypes")
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, DateTime as DateTimeUTC, ProductionTypeText as ProductionType, ActualGenerationOutput as ActualGenerationOutputValue, UpdateTime as UpdateTimeUTC FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND ProductionTypeText='+ "'" +req.params.productiontype+"'" +' AND Year ='+ req.params.year + ' AND Month='+ req.params.mon +' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
+			else 
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, DateTime as DateTimeUTC, ProductionTypeText as ProductionType, ActualGenerationOutput as ActualGenerationOutputValue, UpdateTime as UpdateTimeUTC FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND Year ='+ req.params.year + ' AND Month='+ req.params.mon +' AND Day=' + req.params.day + ' ORDER BY ProductionType.Id';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
-        		console.log('Results returned');
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
+        		console.log('Results returned,2a,csv');
 			});
 		}
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
 		if(req.params.d == 'year')  {
-			let sql='SELECT * FROM AreaTypeCode';
+			if (req.params.productiontype != "AllTypes")
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, ProductionTypeText as ProductionType, sum(ActualGenerationOutput) as ActualGenerationOutputByMonthValue FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND ProductionTypeText= '+ "'" +req.params.productiontype+"'" +' AND Year ='+ req.params.year + ' GROUP BY AggregatedGenerationPerType.Month';
+			else 
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, ProductionTypeText as ProductionType, sum(ActualGenerationOutput) as ActualGenerationOutputByMonthValue FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND Year ='+ req.params.year + ' GROUP BY AggregatedGenerationPerType.Month, ProductionType.Id';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month')  {
-			let sql='SELECT * FROM AreaTypeCode';
+			if (req.params.productiontype != "AllTypes")
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, ProductionTypeText as ProductionType, sum(ActualGenerationOutput) as ActualGenerationOutputByDayValue FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND ProductionTypeText='+ "'" +req.params.productiontype+"'" +' AND Year ='+ req.params.year + ' AND Month=' + req.params.day+ ' GROUP BY AggregatedGenerationPerType.Day';
+			else 
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, ProductionTypeText as ProductionType, sum(ActualGenerationOutput) as ActualGenerationOutputByDayValue FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND Year ='+ req.params.year + ' AND Month=' + req.params.day+ ' GROUP BY AggregatedGenerationPerType.Day, ProductionType.Id';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date')  {
-			let sql='SELECT * FROM AreaTypeCode';
+			if (req.params.productiontype != "AllTypes")
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, DateTime as DateTimeUTC, ProductionTypeText as ProductionType, ActualGenerationOutput as ActualGenerationOutputValue, UpdateTime as UpdateTimeUTC FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND ProductionTypeText='+ "'" +req.params.productiontype+"'" +' AND Year ='+ req.params.year + ' AND Month='+ req.params.mon +' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
+			else 
+				let sql='SELECT "entso-e" as Source, "AggregatedGenerationPerType" as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, DateTime as DateTimeUTC, ProductionTypeText as ProductionType, ActualGenerationOutput as ActualGenerationOutputValue, UpdateTime as UpdateTimeUTC FROM  AggregatedGenerationPerType, AreaTypeCode, MapCode, ResolutionCode, ProductionType WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND ProductionType.Id = ProductionTypeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND Year ='+ req.params.year + ' AND Month='+ req.params.mon +' AND Day=' + req.params.day + ' ORDER BY ProductionType.Id';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
@@ -155,52 +218,82 @@ app.get('/energy/api/DayAheadTotalLoadForecast/:areaname/:productiontype/:resolu
 app.get('/energy/api/AggregatedGenerationPerType/:areaname/:resolution/:d/:date/', (req, res) => {
 	if (req.query.format == 'csv'){ //csv format
 		if(req.params.d == 'year') {
-			let sql='SELECT * FROM AreaTypeCode';
+			let sql='SELECT "entso-e" as Source, 'DayAheadTotalLoadForecast' as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, sum(TotalLoadValue) as DayAheadTotalLoadForecastByDayValue FROM DayAheadTotalLoadForecast, AreaTypeCode, MapCode, ResolutionCode WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND Year ='+ req.params.year + ' AND AreaName ='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' GROUP BY DayAheadTotalLoadForecast.Month';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month') {
-			let sql='SELECT * FROM AreaTypeCode';
+			let sql='SELECT "entso-e" as Source, 'DayAheadTotalLoadForecast' as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, sum(TotalLoadValue) as DayAheadTotalLoadForecastByDayValue FROM DayAheadTotalLoadForecast, AreaTypeCode, MapCode, ResolutionCode WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND Year ='+ req.params.year + ' AND Month ='+ req.params.mon +' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND AreaName ='+"'"+req.params.areaname+"'"+' GROUP BY DayAheadTotalLoadForecast.Day';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT * FROM AreaTypeCode';
+			let sql='SELECT "entso-e" as Source, 'DayAheadTotalLoadForecast' as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, Datetime as DateTimeUTC, TotalLoadValue as DayAheadTotalLoadForecastValue, UpdateTime as UpdateTimeUTC FROM DayAheadTotalLoadForecast, AreaTypeCode, MapCode, ResolutionCode WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND ProductionTypeText='+ "'" +req.params.productiontype+"'" +' AND Year ='+ req.params.year + ' AND Month='+ req.params.mon +' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
         		console.log('Results returned');
 			});
 		}
 		else res.status(404).send('ERROR 404')}
 	else {  //JSON format
 		if(req.params.d == 'year')  {
-			let sql='SELECT * FROM AreaTypeCode';
+			let sql='SELECT "entso-e" as Source, 'DayAheadTotalLoadForecast' as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, sum(TotalLoadValue) as DayAheadTotalLoadForecastByDayValue FROM DayAheadTotalLoadForecast, AreaTypeCode, MapCode, ResolutionCode WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND Year ='+ req.params.year + ' AND AreaName ='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' GROUP BY DayAheadTotalLoadForecast.Month';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month')  {
-			let sql='SELECT * FROM AreaTypeCode';
+			let sql='SELECT "entso-e" as Source, 'DayAheadTotalLoadForecast' as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, sum(TotalLoadValue) as DayAheadTotalLoadForecastByDayValue FROM DayAheadTotalLoadForecast, AreaTypeCode, MapCode, ResolutionCode WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND Year ='+ req.params.year + ' AND Month ='+ req.params.mon +' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND AreaName ='+"'"+req.params.areaname+"'"+' GROUP BY DayAheadTotalLoadForecast.Day';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date') {
-			let sql='SELECT * FROM AreaTypeCode';
+			let sql='SELECT "entso-e" as Source, 'DayAheadTotalLoadForecast' as Dataset, AreaName, AreaTypeCodeText as AreaTypeCode, MapCodeText as MapCode, ResolutionCodeText as ResolutionCode, Year, Month, Day, Datetime as DateTimeUTC, TotalLoadValue as DayAheadTotalLoadForecastValue, UpdateTime as UpdateTimeUTC FROM DayAheadTotalLoadForecast, AreaTypeCode, MapCode, ResolutionCode WHERE AreaTypeCode.Id = AreaTypeCodeId AND MapCode.Id = MapCodeId AND ResolutionCode.Id = ResolutionCodeId AND AreaName='+"'"+req.params.areaname+"'"+' AND ResolutionCodeText='+ "'" +req.params.resolution+"'" +' AND ProductionTypeText='+ "'" +req.params.productiontype+"'" +' AND Year ='+ req.params.year + ' AND Month='+ req.params.mon +' AND Day=' + req.params.day + ' ORDER BY DateTime ASC';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
@@ -213,8 +306,13 @@ app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, re
 			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
         		console.log('Results returned');
 			});
 		}
@@ -222,8 +320,13 @@ app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, re
 			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
         		console.log('Results returned');
 			});
 		}
@@ -231,8 +334,13 @@ app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, re
 			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
         		if(err) throw err;
-        		var csv=convertToCSV(result);
-        		res.send(csv);
+        		if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			var csv=convertToCSV(result);
+        			res.send(csv);}
         		console.log('Results returned');
 			});
 		}
@@ -241,25 +349,40 @@ app.get('/energy/api/ActualvsForecast/:areaname/:resolution/:d/:date/', (req, re
 		if(req.params.d == 'year') {
 			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'month')  {
 			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else if(req.params.d == 'date') {
 			let sql='SELECT * FROM AreaTypeCode';
 			con.query(sql, (err, result) => {
-				res.send(result);
+				if (result==''){
+        			console.log('empty');
+        			res.status(403).send('ERROR 403'); 
+        		}
+        		else{
+        			res.send(result);}
         		console.log('Results returned');
 			});
 		}
 		else res.status(404).send('ERROR 404')}
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`App listening on port ${port}!`))
