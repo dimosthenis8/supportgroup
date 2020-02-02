@@ -1,2 +1,1 @@
-git remote add official git@github.com:ntua/TL19-46.git
-git push -f official master
+git re
